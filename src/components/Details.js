@@ -38,51 +38,60 @@ const Details = ({ scrollToForm }) => {
           </div>
         </div>
 
-
         {selectedDate ? (
           <div className='flex flex-col text-lg sm:text-xl font-medium mt-4'>
             Events
             <hr className='w-full border-gray-400 mt-2 mb-4' />
 
-            <div className='w-full flex flex-col items-start justify-start gap-2 text-sm font-normal'>
-              {eventsOnDate.length > 0 ? (
-                eventsOnDate.map((event, index) => (
-                  <div key={index} className='flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-white p-2 rounded-lg shadow-sm shadow-gray-400 w-full'>
-                    <div className='bg-blue-600 h-1 sm:h-full w-full sm:w-1 rounded-2xl'></div>
-                    <div className='flex flex-col items-start justify-center w-full'>
-                      <div className="font-semibold text-base sm:text-xl">Event: <span className='font-medium'>{event.title}</span></div>
-                      <div className="text-sm sm:text-lg">{event.description}</div>
-                    </div>
-                    <button
-                      onClick={() => handleDelete(event, selectedDate)}
-                      className="self-start sm:self-auto ml-auto bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600 text-sm"
-                    >
-                      <Trash />
-                    </button>
-                  </div>
-                ))
-              ) : (
-                <div className='flex items-center gap-1.5 bg-white p-2 rounded-lg shadow-sm shadow-gray-400 w-full'>
-                  <div className='bg-blue-600 h-full w-1 rounded-2xl'></div>
-                  <div className='text-sm sm:text-base text-center'>
-                    No Events Scheduled For Now On This Date
-                  </div>
+            {selectedDate < new Date().toISOString().slice(0, 10) ? (
+              <div className='flex items-center gap-1.5 bg-white p-2 rounded-lg shadow-sm shadow-gray-400 w-full'>
+                <div className='bg-red-600 h-full w-1 rounded-2xl'></div>
+                <div className='text-sm sm:text-base text-center'>
+                  No Event Could Be Scheduled On A Past Date
                 </div>
-              )}
+              </div>
+            ) : (
+              <div className='w-full flex flex-col items-start justify-start gap-2 text-sm font-normal'>
+                {eventsOnDate.length > 0 ? (
+                  eventsOnDate.map((event, index) => (
+                    <div key={index} className='flex flex-col sm:flex-row items-start sm:items-center gap-3 bg-white p-2 rounded-lg shadow-sm shadow-gray-400 w-full'>
+                      <div className='bg-blue-600 h-1 sm:h-full w-full sm:w-1 rounded-2xl'></div>
+                      <div className='flex flex-col items-start justify-center w-full'>
+                        <div className="font-semibold text-base sm:text-xl">Event: <span className='font-medium'>{event.title}</span></div>
+                        <div className="text-sm sm:text-lg">{event.description}</div>
+                      </div>
+                      <button
+                        onClick={() => handleDelete(event, selectedDate)}
+                        className="self-start sm:self-auto ml-auto bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600 text-sm"
+                      >
+                        <Trash />
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <div className='flex items-center gap-1.5 bg-white p-2 rounded-lg shadow-sm shadow-gray-400 w-full'>
+                    <div className='bg-blue-600 h-full w-1 rounded-2xl'></div>
+                    <div className='text-sm sm:text-base text-center'>
+                      No Events Scheduled For Now On This Date
+                    </div>
+                  </div>
+                )}
 
-              <button
-                onClick={scrollToForm}
-                className='py-1 px-2 text-white font-medium text-sm bg-blue-600 rounded-sm mt-2 hover:bg-white hover:border-blue-600 hover:border hover:text-blue-600 hover:cursor-pointer'
-              >
-                {eventsOnDate.length > 0 ? 'Schedule Another Event' : 'Schedule Event'}
-              </button>
-            </div>
+                <button
+                  onClick={scrollToForm}
+                  className='py-1 px-2 text-white font-medium text-sm bg-blue-600 rounded-sm mt-2 hover:bg-white hover:border-blue-600 hover:border hover:text-blue-600 hover:cursor-pointer'
+                >
+                  {eventsOnDate.length > 0 ? 'Schedule Another Event' : 'Schedule Event'}
+                </button>
+              </div>
+            )}
           </div>
         ) : (
           <div className='h-full flex items-center justify-center text-sm font-medium leading-relaxed w-full mt-4'>
             Click On Any Date On The Calendar To View Events Scheduled On That Date
           </div>
         )}
+
       </div>
     </div>
   );
