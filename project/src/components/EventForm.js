@@ -7,9 +7,12 @@ import DatePicker from 'react-datepicker';
 const EventForm = () => {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [recurrence, setRecurrence] = useState('Daily');
+  const [recurrence, setRecurrence] = useState('');
   const [isAdding, setIsAdding] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [customInterval, setCustomInterval] = useState(1);
+  const [showDailyCustomization, setShowDailyCustomization] = useState(false);
+
 
   const { selectedDate, endDate, setEndDate, dailyEvent } = useCalender();
 
@@ -90,20 +93,62 @@ const EventForm = () => {
           />
         </div>
 
-        <div className='flex gap-2 w-full'>
-          <div className='text-2xl font-medium max-w-2xl'>Recurrence Pattern:</div>
-          <div className='w-full flex items-center gap-2'>
-            {['Daily', 'Weekly', 'Monthly', 'Yearly'].map((type) => (
-              <button
-                key={type}
-                className='bg-blue-600 text-md text-white font-medium rounded px-3 py-1 cursor-pointer'
-                onClick={() => setRecurrence(type)}
-              >
-                {type}
-              </button>
-            ))}
+        <div className='flex flex-col items-start justify-start gap-2 w-full'>
+          <div className='flex items-center space-x-8'>
+            <div className='text-2xl font-medium max-w-2xl'>Recurrence Pattern:</div>
+            <div className='flex items-center gap-2'>
+              {['Daily', 'Weekly', 'Monthly', 'Yearly'].map((type) => (
+                <button
+                  key={type}
+                  className={`px-3 py-1 text-md font-medium rounded ${recurrence === type ? 'bg-white text-blue-600 border border-blue-600' : 'bg-blue-600 text-white'} 
+                       transition duration-200`}
+                  onClick={() => {
+                    setRecurrence(type);
+                    if (type !== 'Daily') setShowDailyCustomization(false);
+                  }}
+                >
+                  {type}
+                </button>
+              ))}
+            </div>
           </div>
+
+          {recurrence === 'Daily' && (
+            <div className='flex items-center relative px-60'>
+              {!showDailyCustomization ? (
+                <button
+                  onClick={() => setShowDailyCustomization(true)}
+                  className=" bg-blue-600 text-white px-2 py-1 rounded-md"
+                >
+                  Customize daily recurrence
+                </button>
+              ) : (
+                <div className="flex items-center gap-3 bg-white border-blue-600 border-2 px-2 py-1 rounded-xl">
+                  <span className="text-md text-gray-800">Repeat every</span>
+                  <input
+                    type="number"
+                    value={customInterval}
+                    min={1}
+                    onChange={(e) => setCustomInterval(e.target.value)}
+                    className="w-16 px-2 py-1 border rounded-md text-center"
+                  />
+                  <span className="text-md text-gray-800">day(s)</span>
+                  <button
+                    onClick={() => setShowDailyCustomization(false)}
+                    className="text-red-500 ml-2 font-black hover:text-red-700"
+
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
         </div>
+
+
+
 
         <div className='w-full flex items-center justify-start'>
           <button
@@ -112,27 +157,24 @@ const EventForm = () => {
             onClick={async () => {
               setIsAdding(true);
 
-              // await addEvent({
-              //   title,
-              //   description,
-              //   startDate: selectedDate instanceof Date ? selectedDate.toISOString() : new Date(selectedDate).toISOString(),
-              //   endDate: endDate instanceof Date ? endDate.toISOString() : new Date(endDate).toISOString(),
-              //   recurrence,
-              // });
+              if (recurrence === 'Daily') {
 
-              await dailyEvent({
-                title,
-                description,
-                startDate: selectedDate instanceof Date ? selectedDate.toISOString() : new Date(selectedDate).toISOString(),
-                endDate: endDate instanceof Date ? endDate.toISOString() : new Date(endDate).toISOString(),
-              });
+                await dailyEvent({
+                  title,
+                  description,
+                  startDate: selectedDate instanceof Date ? selectedDate.toISOString() : new Date(selectedDate).toISOString(),
+                  endDate: endDate instanceof Date ? endDate.toISOString() : new Date(endDate).toISOString(),
+                  customInterval: showDailyCustomization ? customInterval : 1,
+                });
+
+              }
 
 
               setIsAdding(false);
+
               if (title && description && selectedDate && endDate) {
                 setShowSuccess(true);
                 setTimeout(() => setShowSuccess(false), 3000);
-
               }
               else {
                 alert('Fill all fields');
