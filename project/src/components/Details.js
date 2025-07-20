@@ -15,12 +15,13 @@ const Details = () => {
 
   return (
     <div className='w-[40%] h-[70vh] flex flex-col gap-5 px-4 py-6'>
-      <div className='bg-white rounded-full shadow-sm shadow-gray-900 px-8 py-2 text-xl font-bold'>Details: </div>
+      <div className='bg-white rounded-full shadow-sm shadow-gray-700 px-8 py-2 text-xl font-bold'>Details: </div>
 
-      <div className='h-full w-full flex flex-col gap-4 bg-white rounded-2xl shadow-sm shadow-gray-900 px-8 py-4'>
+      <div className='h-full w-full flex flex-col gap-4 bg-white rounded-2xl shadow-sm shadow-gray-700 px-8 py-4'>
 
-        <div className='text-xl font-medium'>
-          Date: {selectedDate || 'Select A Date'}
+        <div className='flex items-center gap-4'>
+          <div className='text-xl font-medium'>Date:</div> 
+          <div className='text-lg font-normal'>{selectedDate || 'Select A Date'}</div>
         </div>
         <div className='flex flex-col text-xl font-medium mt-4 h-full'>
           Events
@@ -34,7 +35,7 @@ const Details = () => {
                 </div>
               })
             ) : (
-              <div className='text-center'>
+              <div className='text-center mb-3'>
                 No Events Scheduled For Now On This Date
               </div>
             )}
