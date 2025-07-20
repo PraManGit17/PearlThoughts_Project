@@ -1,10 +1,9 @@
-"use client"
-
 import React from 'react'
 import { useCalender } from '@/context/CalenderContext'
+import { Trash } from 'lucide-react';
 
 const Details = ({ scrollToForm }) => {
-  const { selectedDate, events } = useCalender();
+  const { selectedDate, events, deleteEvent } = useCalender();
 
   const eventsOnDate = events.filter(event => {
     if (!event.occurrences || !selectedDate) return false;
@@ -15,7 +14,13 @@ const Details = ({ scrollToForm }) => {
     });
   });
 
-  console.log(eventsOnDate)
+  const handleDelete = (event, date) => {
+    const confirmDelete = confirm("Are you sure you want to delete this event occurrence?");
+    if (confirmDelete) {
+      deleteEvent(event, date);
+    }
+  };
+
   return (
     <div className='w-[40%] h-[80vh] flex flex-col gap-5 px-4'>
       <div className='bg-white rounded-full shadow-sm shadow-gray-700 px-4 py-2 text-xl font-bold'>
@@ -23,7 +28,6 @@ const Details = ({ scrollToForm }) => {
       </div>
 
       <div className='h-full w-full flex flex-col bg-white rounded-2xl shadow-sm shadow-gray-700 px-5 py-4'>
-
         <div className='flex flex-col text-xl font-medium'>
           Date
           <hr className='w-full border-gray-400 mt-2 mb-4' />
@@ -40,12 +44,18 @@ const Details = ({ scrollToForm }) => {
             <div className='h-full max-w-2xl flex flex-col items-start justify-start gap-2 text-sm font-normal'>
               {eventsOnDate.length > 0 ? (
                 eventsOnDate.map((event, index) => (
-                  <div key={index} className='flex items-center gap-1.5 bg-white p-2 rounded-lg shadow-sm shadow-gray-400'>
+                  <div key={index} className='flex items-center gap-3 bg-white p-2 rounded-lg shadow-sm shadow-gray-400 w-full'>
                     <div className='bg-blue-600 h-full w-1 rounded-2xl'></div>
-                    <div className='w-full flex flex-col items-start justify-center'>
+                    <div className='flex flex-col items-start justify-center w-full'>
                       <div className="font-semibold text-xl">Event: <span className='font-medium'>{event.title}</span></div>
                       <div className="text-lg">{event.description}</div>
                     </div>
+                    <button
+                      onClick={() => handleDelete(event, selectedDate)}
+                      className="ml-auto bg-red-500 text-white px-2 py-1 rounded-md hover:bg-red-600 text-sm"
+                    >
+                      <Trash />
+                    </button>
                   </div>
                 ))
               ) : (
@@ -56,13 +66,13 @@ const Details = ({ scrollToForm }) => {
                   </div>
                 </div>
               )}
+
               <button
                 onClick={scrollToForm}
                 className='py-1 px-2 text-white font-medium text-sm bg-blue-600 rounded-sm mt-2 hover:bg-white hover:border-blue-600 hover:border hover:text-blue-600 hover:cursor-pointer'
               >
                 {eventsOnDate.length > 0 ? 'Schedule Another Event' : 'Schedule Event'}
               </button>
-
             </div>
           </div>
         ) : (
@@ -72,7 +82,7 @@ const Details = ({ scrollToForm }) => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Details
+export default Details;

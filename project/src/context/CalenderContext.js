@@ -31,16 +31,60 @@ export const CalenderProvider = ({ children }) => {
     localStorage.setItem('calendar-events', JSON.stringify(events));
   }, [events]);
 
+  const deleteEvent = (eventToDelete, occurrenceToDelete) => {
+    const updatedEvents = events
+      .map((event) => {
+        if (event.createdAt !== eventToDelete.createdAt) return event;
+
+        const updatedOccurrences = event.occurrences.filter((date) => {
+          const dateStr = new Date(date).toISOString().slice(0, 10);
+          return dateStr !== occurrenceToDelete;
+        });
+
+        if (updatedOccurrences.length === 0) return null;
+
+        return {
+          ...event,
+          occurrences: updatedOccurrences,
+        };
+      })
+      .filter(Boolean); 
+
+    setEvents(updatedEvents);
+  };
+
+
+  const oneTimeEvent = ({
+    title,
+    description,
+    startDate,
+  }) => {
+    const eventDate = new Date(startDate);
+
+    const newEvent = {
+      title,
+      description,
+      startDate,
+      recurrence: 'none',
+      occurrences: [eventDate],
+      createdAt: new Date().toISOString(),
+    };
+
+    const createdEvent = [...events, newEvent];
+    setEvents(createdEvent);
+  };
+
+
   const dailyEvent = ({
     title,
     description,
     startDate,
     endDate,
-    customInterval = 1,
+    customInterval,
   }) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
-    const interval = parseInt(customInterval) || 1;
+    const interval = parseInt(customInterval);
 
     const diffTime = Math.abs(end - start);
     const diffDays = diffTime / (1000 * 60 * 60 * 24);
@@ -125,14 +169,13 @@ export const CalenderProvider = ({ children }) => {
     setEvents(createdEvent);
   };
 
-
   const monthlyEvent = ({
     title,
     description,
     startDate,
     endDate,
     customInterval = 1,
-    dayOfMonth = null, 
+    dayOfMonth = null,
   }) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -173,8 +216,8 @@ export const CalenderProvider = ({ children }) => {
     description,
     startDate,
     endDate,
-    customInterval = 1, 
-    dayOfMonth = null, 
+    customInterval = 1,
+    dayOfMonth = null,
   }) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -182,7 +225,7 @@ export const CalenderProvider = ({ children }) => {
     const occurrences = [];
 
     const day = dayOfMonth || start.getDate();
-    const month = start.getMonth(); // 0-indexed
+    const month = start.getMonth();
 
     let currentYear = start.getFullYear();
 
@@ -213,94 +256,12 @@ export const CalenderProvider = ({ children }) => {
   };
 
 
-  // const addEvent = ({
-  //   title,
-  //   description,
-  //   startDate,
-  //   endDate,
-  //   recurrence
-  // }) => {
-
-
-  //   const start = new Date(startDate);
-  //   const end = new Date(endDate);
-
-  //   const diffTime = Math.abs(end - start);
-  //   const diffDays = diffTime / (1000 * 60 * 60 * 24);
-
-  //   let reocurr_events = false;
-
-  //   let interval = 1;
-
-  //   switch (recurrence) {
-  //     case 'Daily':
-  //       reocurr_events = diffDays >= 2;
-  //       interval = 1;
-  //       break;
-
-  //     case 'Weekly':
-  //       reocurr_events = diffDays >= 8
-  //       interval = 7;
-  //       break;
-
-
-  //     case 'Monthly':
-  //       reocurr_events = diffDays >= 31;
-  //       interval = 30;
-  //       break;
-
-  //     case 'Yearly':
-  //       reocurr_events = diffDays >= 366;
-  //       interval = 365;
-  //       break;
-  //   }
-
-  //   if (!reocurr_events) {
-  //     alert(`Selected Dates are too close for ${recurrence} recurrence`);
-  //   }
-
-  //   const occurences = [];
-  //   const currentDate = new Date(start);
-
-  //   while (currentDate <= end) {
-  //     occurences.push(new Date(currentDate));
-
-  //     if (recurrence === 'Daily') {
-  //       currentDate.setDate(currentDate.getDate() + 1);
-  //     }
-  //     else if (recurrence === 'Weekly') {
-  //       currentDate.setDate(currentDate.getDate() + 7);
-  //     }
-  //     else if (recurrence === 'Monthly') {
-  //       currentDate.setDate(currentDate.getMonth() + 1);
-  //     }
-  //     else if (recurrence === 'Yearly') {
-  //       currentDate.setDate(currentDate.getFullYear() + 1);
-  //     }
-  //   }
-
-  //   const newEvent = {
-  //     title,
-  //     description,
-  //     startDate,
-  //     endDate,
-  //     recurrence,
-  //     occurences,
-  //     createdAt: new Date().toISOString(),
-  //   };
-
-  //   const createdEvent = [...events, newEvent];
-  //   setEvents(createdEvent);
-
-
-  // };
-
 
 
   return (
     <CalenderContext.Provider
       value={
-        { selectedDate, setSelectedDate, events, dailyEvent, weeklyEvent, monthlyEvent, yearlyEvent, endDate, setEndDate }
+        { selectedDate, setSelectedDate, events, deleteEvent, oneTimeEvent, dailyEvent, weeklyEvent, monthlyEvent, yearlyEvent, endDate, setEndDate }
       } >
       {children}
     </CalenderContext.Provider>

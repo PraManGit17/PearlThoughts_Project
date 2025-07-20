@@ -18,7 +18,7 @@ const EventForm = () => {
   const [monthlyDay, setMonthlyDay] = useState(null);
   const [yearlyInterval, setYearlyInterval] = useState(1);
 
-  const { selectedDate, endDate, setEndDate, dailyEvent, weeklyEvent, monthlyEvent, yearlyEvent } = useCalender();
+  const { selectedDate, endDate, setEndDate, oneTimeEvent, dailyEvent, weeklyEvent, monthlyEvent, yearlyEvent } = useCalender();
 
   const formatDisplayDate = (date) => {
     if (!date) return 'Invalid Date';
@@ -101,14 +101,13 @@ const EventForm = () => {
           <div className='flex items-center space-x-8'>
             <div className='text-2xl font-medium max-w-2xl'>Recurrence Pattern:</div>
             <div className='flex items-center gap-2'>
-              {['Daily', 'Weekly', 'Monthly', 'Yearly'].map((type) => (
+              {['None', 'Daily', 'Weekly', 'Monthly', 'Yearly'].map((type) => (
                 <button
                   key={type}
-                  className={`px-3 py-1 text-md font-medium rounded ${recurrence === type ? 'bg-white text-blue-600 border border-blue-600' : 'bg-blue-600 text-white'} 
-                       transition duration-200`}
+                  className={`px-3 py-1 text-md font-medium rounded ${recurrence === type ? 'bg-white text-blue-600 border border-blue-600' : 'bg-blue-600 text-white'} transition duration-200`}
                   onClick={() => {
                     setRecurrence(type);
-                    if (type !== 'Daily') setShowDailyCustomization(false);
+                    setShowDailyCustomization(false);
                   }}
                 >
                   {type}
@@ -258,6 +257,16 @@ const EventForm = () => {
             onClick={async () => {
               setIsAdding(true);
 
+              if (recurrence === 'None') {
+                await oneTimeEvent({
+                  title,
+                  description,
+                  startDate: selectedDate instanceof Date
+                    ? selectedDate.toISOString()
+                    : new Date(selectedDate).toISOString(),
+                });
+              }
+
               if (recurrence === 'Daily') {
                 await dailyEvent({
                   title,
@@ -287,7 +296,7 @@ const EventForm = () => {
                   startDate: selectedDate instanceof Date ? selectedDate.toISOString() : new Date(selectedDate).toISOString(),
                   endDate: endDate instanceof Date ? endDate.toISOString() : new Date(endDate).toISOString(),
                   customInterval: monthlyInterval,
-                  dayOfMonth: monthlyDay, // If null, defaults to startDate.getDate()
+                  dayOfMonth: monthlyDay,
                 });
               }
 
@@ -302,12 +311,15 @@ const EventForm = () => {
                 });
               }
 
+              if (selectedDate === endDate) {
+
+              }
 
               setIsAdding(false);
 
               if (title && description && selectedDate && endDate) {
                 setShowSuccess(true);
-                setTimeout(() => setShowSuccess(false), 3000);
+                setTimeout(() => setShowSuccess(false), 2000);
               }
               else {
                 alert('Fill all fields');
