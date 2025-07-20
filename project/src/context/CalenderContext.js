@@ -73,6 +73,57 @@ export const CalenderProvider = ({ children }) => {
     setEvents(createdEvent);
   };
 
+  const weeklyEvent = ({
+    title,
+    description,
+    startDate,
+    endDate,
+    customInterval = 1,
+    selectedWeekdays = [],
+  }) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const occurrences = [];
+
+    const currentDate = new Date(start);
+    const dayMap = {
+      SU: 0,
+      MO: 1,
+      TU: 2,
+      WE: 3,
+      TH: 4,
+      FR: 5,
+      SA: 6,
+    };
+
+    while (currentDate <= end) {
+      selectedWeekdays.forEach((dayCode) => {
+        const weekdayOffset = (dayMap[dayCode] - currentDate.getDay() + 7) % 7;
+        const nextDate = new Date(currentDate);
+        nextDate.setDate(currentDate.getDate() + weekdayOffset);
+
+        if (nextDate <= end && nextDate >= start) {
+          occurrences.push(new Date(nextDate));
+        }
+      });
+
+      currentDate.setDate(currentDate.getDate() + customInterval * 7);
+    }
+
+    const newEvent = {
+      title,
+      description,
+      startDate,
+      endDate,
+      recurrence: `weekly-every-${customInterval}-on-${selectedWeekdays.join(",")}`,
+      occurrences,
+      createdAt: new Date().toISOString(),
+    };
+
+    const createdEvent = [...events, newEvent];
+    setEvents(createdEvent);
+  };
 
 
 
@@ -163,7 +214,7 @@ export const CalenderProvider = ({ children }) => {
   return (
     <CalenderContext.Provider
       value={
-        { selectedDate, setSelectedDate, events, dailyEvent, endDate, setEndDate }
+        { selectedDate, setSelectedDate, events, dailyEvent, weeklyEvent, endDate, setEndDate }
       } >
       {children}
     </CalenderContext.Provider>

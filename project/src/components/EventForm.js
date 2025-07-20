@@ -14,7 +14,7 @@ const EventForm = () => {
   const [showDailyCustomization, setShowDailyCustomization] = useState(false);
 
 
-  const { selectedDate, endDate, setEndDate, dailyEvent } = useCalender();
+  const { selectedDate, endDate, setEndDate, dailyEvent, weeklyEvent } = useCalender();
 
   const formatDisplayDate = (date) => {
     if (!date) return 'Invalid Date';
@@ -113,6 +113,8 @@ const EventForm = () => {
             </div>
           </div>
 
+          {/* Customized Daily */}
+
           {recurrence === 'Daily' && (
             <div className='flex items-center relative px-60'>
               {!showDailyCustomization ? (
@@ -144,10 +146,7 @@ const EventForm = () => {
               )}
             </div>
           )}
-
         </div>
-
-
 
 
         <div className='w-full flex items-center justify-start'>
@@ -158,7 +157,6 @@ const EventForm = () => {
               setIsAdding(true);
 
               if (recurrence === 'Daily') {
-
                 await dailyEvent({
                   title,
                   description,
@@ -169,6 +167,15 @@ const EventForm = () => {
 
               }
 
+              if (recurrence === 'Weekly') {
+                await weeklyEvent({
+                  title,
+                  description,
+                  startDate: selectedDate instanceof Date ? selectedDate.toISOString() : new Date(selectedDate).toISOString(),
+                  endDate: endDate instanceof Date ? endDate.toISOString() : new Date(endDate).toISOString(),
+                });
+
+              }
 
               setIsAdding(false);
 
