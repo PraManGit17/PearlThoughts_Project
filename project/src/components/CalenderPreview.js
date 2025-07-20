@@ -16,7 +16,7 @@ const CalendarPreview = () => {
   };
 
   const calenderEvents = events.flatMap(event => 
-    event.occurences.map(date => ({
+    event.occurrences.map(date => ({
       title: event.title,
       start: date,
     }))

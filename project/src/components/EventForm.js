@@ -11,7 +11,7 @@ const EventForm = () => {
   const [isAdding, setIsAdding] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
 
-  const { selectedDate, endDate, setEndDate, addEvent } = useCalender();
+  const { selectedDate, endDate, setEndDate, dailyEvent } = useCalender();
 
   const formatDisplayDate = (date) => {
     if (!date) return 'Invalid Date';
@@ -20,7 +20,7 @@ const EventForm = () => {
 
   return (
     <div className='flex items-center w-full h-screen p-5'>
-      
+
       {showSuccess && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="bg-white border border-blue-500 rounded-xl shadow-lg p-6 flex flex-col items-center gap-4">
@@ -89,7 +89,7 @@ const EventForm = () => {
             className='bg-gray-100 text-center outline-none py-2 px-4 rounded-md placeholder:text-md placeholder:font-normal placeholder:text-gray-400 placeholder:text-center'
           />
         </div>
-        
+
         <div className='flex gap-2 w-full'>
           <div className='text-2xl font-medium max-w-2xl'>Recurrence Pattern:</div>
           <div className='w-full flex items-center gap-2'>
@@ -112,19 +112,30 @@ const EventForm = () => {
             onClick={async () => {
               setIsAdding(true);
 
-              await addEvent({
+              // await addEvent({
+              //   title,
+              //   description,
+              //   startDate: selectedDate instanceof Date ? selectedDate.toISOString() : new Date(selectedDate).toISOString(),
+              //   endDate: endDate instanceof Date ? endDate.toISOString() : new Date(endDate).toISOString(),
+              //   recurrence,
+              // });
+
+              await dailyEvent({
                 title,
                 description,
                 startDate: selectedDate instanceof Date ? selectedDate.toISOString() : new Date(selectedDate).toISOString(),
                 endDate: endDate instanceof Date ? endDate.toISOString() : new Date(endDate).toISOString(),
-                recurrence,
               });
+
 
               setIsAdding(false);
               if (title && description && selectedDate && endDate) {
                 setShowSuccess(true);
                 setTimeout(() => setShowSuccess(false), 3000);
 
+              }
+              else {
+                alert('Fill all fields');
               }
             }}
           >

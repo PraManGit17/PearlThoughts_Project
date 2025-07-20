@@ -31,6 +31,50 @@ export const CalenderProvider = ({ children }) => {
     localStorage.setItem('calendar-events', JSON.stringify(events));
   }, [events]);
 
+  const dailyEvent = ({
+    title,
+    description,
+    startDate,
+    endDate
+  }) => {
+
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const diffTime = Math.abs(end - start);
+    const diffDays = diffTime / (1000 * 60 * 60 * 24);
+
+    let reocurr_events = false;
+    let interval = 1;
+
+    if (!diffDays >= 1) {
+      alert(`Selected Dates are too close for ${recurrence} recurrence`);
+    }
+
+    const occurrences = [];
+    const currentDate = new Date(start);
+
+    while (currentDate <= end) {
+      occurrences.push(new Date(currentDate));
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    const newEvent = {
+      title,
+      description,
+      startDate,
+      endDate,
+      recurrence: 'daily',
+      occurrences, 
+      createdAt: new Date().toISOString(),
+    };
+
+
+    const createdEvent = [...events, newEvent];
+    setEvents(createdEvent);
+  };
+
+
   const addEvent = ({
     title,
     description,
@@ -39,10 +83,6 @@ export const CalenderProvider = ({ children }) => {
     recurrence
   }) => {
 
-    if (!startDate || !endDate || !title) {
-      alert("Please fill all fields including start and end date");
-      return;
-    }
 
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -118,10 +158,11 @@ export const CalenderProvider = ({ children }) => {
   };
 
 
+
   return (
     <CalenderContext.Provider
       value={
-        { selectedDate, setSelectedDate, events, addEvent, endDate, setEndDate }
+        { selectedDate, setSelectedDate, events, dailyEvent, endDate, setEndDate }
       } >
       {children}
     </CalenderContext.Provider>

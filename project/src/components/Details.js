@@ -15,6 +15,7 @@ const Details = ({ scrollToForm }) => {
     });
   });
 
+  console.log(eventsOnDate)
   return (
     <div className='w-[40%] h-[80vh] flex flex-col gap-5 px-4'>
       <div className='bg-white rounded-full shadow-sm shadow-gray-700 px-4 py-2 text-xl font-bold'>
