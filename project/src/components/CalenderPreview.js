@@ -15,10 +15,16 @@ const CalendarPreview = () => {
     setSelectedDate(info.dateStr);
   };
 
+  const calenderEvents = events.flatMap(event => 
+    event.occurences.map(date => ({
+      title: event.title,
+      start: date,
+    }))
+  )
   return (
     <div className='w-[50%] p-5 shadow-sm shadow-gray-700 rounded-2xl'>
       <FullCalendar
-        height={"70vh"}
+        height={"75vh"}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
         headerToolbar={{
           left: "prev,next",
@@ -30,6 +36,7 @@ const CalendarPreview = () => {
         selectMirror={true}
         dayMaxEvents={true}
         dateClick={handleClick}
+        events={calenderEvents}
       />
     </div>
   );
