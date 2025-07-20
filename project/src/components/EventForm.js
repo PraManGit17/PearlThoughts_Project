@@ -16,7 +16,7 @@ const EventForm = () => {
   const [selectedWeekdays, setSelectedWeekdays] = useState([]);
   const [monthlyInterval, setMonthlyInterval] = useState(1);
   const [monthlyDay, setMonthlyDay] = useState(null);
-
+  const [yearlyInterval, setYearlyInterval] = useState(1);
 
   const { selectedDate, endDate, setEndDate, dailyEvent, weeklyEvent, monthlyEvent, yearlyEvent } = useCalender();
 
@@ -183,6 +183,7 @@ const EventForm = () => {
             </div>
           )}
 
+          {/* Customized Monthly */}
           {recurrence === 'Monthly' && (
             <div className="flex flex-col gap-4 mt-4">
 
@@ -214,6 +215,38 @@ const EventForm = () => {
 
             </div>
           )}
+
+          {/* Customized Yearly */}
+          {recurrence === 'Yearly' && (
+            <div className="flex flex-col gap-4 mt-4">
+              <div className="flex items-center gap-3">
+                <span className="text-md text-gray-800">Repeat every</span>
+                <input
+                  type="number"
+                  min={1}
+                  value={yearlyInterval}
+                  onChange={(e) => setYearlyInterval(Number(e.target.value))}
+                  className="w-16 px-2 py-1 border rounded-md text-center"
+                />
+                <span className="text-md text-gray-800">year(s)</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-md text-gray-800">On the</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={31}
+                  placeholder={selectedDate ? new Date(selectedDate).getDate() : '15'}
+                  value={monthlyDay || ''}
+                  onChange={(e) => setMonthlyDay(Number(e.target.value))}
+                  className="w-16 px-2 py-1 border rounded-md text-center"
+                />
+                <span className="text-md text-gray-800">day of the month</span>
+              </div>
+            </div>
+          )}
+
 
         </div>
 
@@ -255,6 +288,17 @@ const EventForm = () => {
                   endDate: endDate instanceof Date ? endDate.toISOString() : new Date(endDate).toISOString(),
                   customInterval: monthlyInterval,
                   dayOfMonth: monthlyDay, // If null, defaults to startDate.getDate()
+                });
+              }
+
+              if (recurrence === 'Yearly') {
+                await yearlyEvent({
+                  title,
+                  description,
+                  startDate: selectedDate instanceof Date ? selectedDate.toISOString() : new Date(selectedDate).toISOString(),
+                  endDate: endDate instanceof Date ? endDate.toISOString() : new Date(endDate).toISOString(),
+                  customInterval: yearlyInterval,
+                  dayOfMonth: monthlyDay,
                 });
               }
 

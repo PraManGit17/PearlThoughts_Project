@@ -132,7 +132,7 @@ export const CalenderProvider = ({ children }) => {
     startDate,
     endDate,
     customInterval = 1,
-    dayOfMonth = null, // If null, default to startDate's day
+    dayOfMonth = null, 
   }) => {
     const start = new Date(startDate);
     const end = new Date(endDate);
@@ -160,6 +160,50 @@ export const CalenderProvider = ({ children }) => {
       startDate,
       endDate,
       recurrence: `monthly-every-${customInterval}-on-${initialDay}`,
+      occurrences,
+      createdAt: new Date().toISOString(),
+    };
+
+    const createdEvent = [...events, newEvent];
+    setEvents(createdEvent);
+  };
+
+  const yearlyEvent = ({
+    title,
+    description,
+    startDate,
+    endDate,
+    customInterval = 1, 
+    dayOfMonth = null, 
+  }) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const occurrences = [];
+
+    const day = dayOfMonth || start.getDate();
+    const month = start.getMonth(); // 0-indexed
+
+    let currentYear = start.getFullYear();
+
+    while (true) {
+      const nextDate = new Date(currentYear, month, day);
+
+      if (nextDate > end) break;
+
+      if (nextDate >= start) {
+        occurrences.push(nextDate);
+      }
+
+      currentYear += customInterval;
+    }
+
+    const newEvent = {
+      title,
+      description,
+      startDate,
+      endDate,
+      recurrence: `yearly-every-${customInterval}-years`,
       occurrences,
       createdAt: new Date().toISOString(),
     };
@@ -256,7 +300,7 @@ export const CalenderProvider = ({ children }) => {
   return (
     <CalenderContext.Provider
       value={
-        { selectedDate, setSelectedDate, events, dailyEvent, weeklyEvent, monthlyEvent, endDate, setEndDate }
+        { selectedDate, setSelectedDate, events, dailyEvent, weeklyEvent, monthlyEvent, yearlyEvent, endDate, setEndDate }
       } >
       {children}
     </CalenderContext.Provider>
