@@ -12,9 +12,13 @@ const EventForm = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [customInterval, setCustomInterval] = useState(1);
   const [showDailyCustomization, setShowDailyCustomization] = useState(false);
+  const [weeklyInterval, setWeeklyInterval] = useState(1);
+  const [selectedWeekdays, setSelectedWeekdays] = useState([]);
+  const [monthlyInterval, setMonthlyInterval] = useState(1);
+  const [monthlyDay, setMonthlyDay] = useState(null);
 
 
-  const { selectedDate, endDate, setEndDate, dailyEvent, weeklyEvent } = useCalender();
+  const { selectedDate, endDate, setEndDate, dailyEvent, weeklyEvent, monthlyEvent, yearlyEvent } = useCalender();
 
   const formatDisplayDate = (date) => {
     if (!date) return 'Invalid Date';
@@ -117,35 +121,100 @@ const EventForm = () => {
 
           {recurrence === 'Daily' && (
             <div className='flex items-center relative px-60'>
-              {!showDailyCustomization ? (
+              <div className="flex items-center gap-3 bg-white shadow-sm shadow-gray-800 px-3 py-2 rounded-lg">
+                <span className="text-md text-gray-800">Repeat every</span>
+                <input
+                  type="number"
+                  value={customInterval}
+                  min={1}
+                  onChange={(e) => setCustomInterval(e.target.value)}
+                  className="w-16 px-2 py-1 border rounded-md text-center"
+                />
+                <span className="text-md text-gray-800">day(s)</span>
                 <button
-                  onClick={() => setShowDailyCustomization(true)}
-                  className=" bg-blue-600 text-white px-2 py-1 rounded-md"
+                  onClick={() => setShowDailyCustomization(false)}
+                  className="text-red-500 ml-2 font-black hover:text-red-700"
+
                 >
-                  Customize daily recurrence
+                  ✕
                 </button>
-              ) : (
-                <div className="flex items-center gap-3 bg-white border-blue-600 border-2 px-2 py-1 rounded-xl">
+              </div>
+
+            </div>
+          )}
+
+          {/* Customized Weekly */}
+          {recurrence === 'Weekly' && (
+            <div className='mt-2 px-60 '>
+              <div className='flex flex-col gap-4 px-3 py-2 shadow-sm shadow-gray-800 rounded-lg'>
+                <div className="flex items-center gap-3 ">
                   <span className="text-md text-gray-800">Repeat every</span>
                   <input
                     type="number"
-                    value={customInterval}
                     min={1}
-                    onChange={(e) => setCustomInterval(e.target.value)}
+                    value={weeklyInterval}
+                    onChange={(e) => setWeeklyInterval(Number(e.target.value))}
                     className="w-16 px-2 py-1 border rounded-md text-center"
                   />
-                  <span className="text-md text-gray-800">day(s)</span>
-                  <button
-                    onClick={() => setShowDailyCustomization(false)}
-                    className="text-red-500 ml-2 font-black hover:text-red-700"
-
-                  >
-                    ✕
-                  </button>
+                  <span className="text-md text-gray-800">week(s)</span>
                 </div>
-              )}
+
+                <div className="flex flex-wrap gap-3">
+                  {['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'].map((day) => (
+                    <label key={day} className="flex items-center gap-1 text-sm font-medium text-gray-700">
+                      <input
+                        type="checkbox"
+                        value={day}
+                        checked={selectedWeekdays.includes(day)}
+                        onChange={() => {
+                          setSelectedWeekdays((prev) =>
+                            prev.includes(day)
+                              ? prev.filter((d) => d !== day)
+                              : [...prev, day]
+                          );
+                        }}
+                        className="accent-blue-600"
+                      />
+                      {day}
+                    </label>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
+
+          {recurrence === 'Monthly' && (
+            <div className="flex flex-col gap-4 mt-4">
+
+              <div className="flex items-center gap-3">
+                <span className="text-md text-gray-800">Repeat every</span>
+                <input
+                  type="number"
+                  min={1}
+                  value={monthlyInterval}
+                  onChange={(e) => setMonthlyInterval(Number(e.target.value))}
+                  className="w-16 px-2 py-1 border rounded-md text-center"
+                />
+                <span className="text-md text-gray-800">month(s)</span>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <span className="text-md text-gray-800">On the</span>
+                <input
+                  type="number"
+                  min={1}
+                  max={31}
+                  placeholder={selectedDate ? new Date(selectedDate).getDate() : '15'}
+                  value={monthlyDay || ''}
+                  onChange={(e) => setMonthlyDay(Number(e.target.value))}
+                  className="w-16 px-2 py-1 border rounded-md text-center"
+                />
+                <span className="text-md text-gray-800">day of the month</span>
+              </div>
+
+            </div>
+          )}
+
         </div>
 
 
@@ -173,9 +242,22 @@ const EventForm = () => {
                   description,
                   startDate: selectedDate instanceof Date ? selectedDate.toISOString() : new Date(selectedDate).toISOString(),
                   endDate: endDate instanceof Date ? endDate.toISOString() : new Date(endDate).toISOString(),
+                  customInterval: weeklyInterval,
+                  selectedWeekdays: selectedWeekdays.length > 0 ? selectedWeekdays : ['MO'], // fallback
                 });
-
               }
+
+              if (recurrence === 'Monthly') {
+                await monthlyEvent({
+                  title,
+                  description,
+                  startDate: selectedDate instanceof Date ? selectedDate.toISOString() : new Date(selectedDate).toISOString(),
+                  endDate: endDate instanceof Date ? endDate.toISOString() : new Date(endDate).toISOString(),
+                  customInterval: monthlyInterval,
+                  dayOfMonth: monthlyDay, // If null, defaults to startDate.getDate()
+                });
+              }
+
 
               setIsAdding(false);
 

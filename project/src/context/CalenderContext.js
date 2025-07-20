@@ -126,6 +126,48 @@ export const CalenderProvider = ({ children }) => {
   };
 
 
+  const monthlyEvent = ({
+    title,
+    description,
+    startDate,
+    endDate,
+    customInterval = 1,
+    dayOfMonth = null, // If null, default to startDate's day
+  }) => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const occurrences = [];
+
+    const initialDay = dayOfMonth || start.getDate();
+    let current = new Date(start);
+
+    while (current <= end) {
+      const year = current.getFullYear();
+      const month = current.getMonth();
+
+      const nextDate = new Date(year, month, initialDay);
+      if (nextDate >= start && nextDate <= end) {
+        occurrences.push(new Date(nextDate));
+      }
+
+      current.setMonth(current.getMonth() + customInterval);
+    }
+
+    const newEvent = {
+      title,
+      description,
+      startDate,
+      endDate,
+      recurrence: `monthly-every-${customInterval}-on-${initialDay}`,
+      occurrences,
+      createdAt: new Date().toISOString(),
+    };
+
+    const createdEvent = [...events, newEvent];
+    setEvents(createdEvent);
+  };
+
 
   // const addEvent = ({
   //   title,
@@ -214,7 +256,7 @@ export const CalenderProvider = ({ children }) => {
   return (
     <CalenderContext.Provider
       value={
-        { selectedDate, setSelectedDate, events, dailyEvent, weeklyEvent, endDate, setEndDate }
+        { selectedDate, setSelectedDate, events, dailyEvent, weeklyEvent, monthlyEvent, endDate, setEndDate }
       } >
       {children}
     </CalenderContext.Provider>
