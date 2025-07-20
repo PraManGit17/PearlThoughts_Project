@@ -6,7 +6,6 @@ import { useCalender } from '@/context/CalenderContext'
 const Details = ({ scrollToForm }) => {
   const { selectedDate, events } = useCalender();
 
-  // ✅ Filter events based on selectedDate
   const eventsOnDate = events.filter(event => {
     if (!event.occurrences || !selectedDate) return false;
 
@@ -56,14 +55,13 @@ const Details = ({ scrollToForm }) => {
                   </div>
                 </div>
               )}
-
               <button
                 onClick={scrollToForm}
-                className='py-1 px-2 text-white font-medium text-sm bg-blue-600 rounded-sm mt-2
-                hover:bg-white hover:border-blue-600 hover:border hover:text-blue-600 hover:cursor-pointer'
+                className='py-1 px-2 text-white font-medium text-sm bg-blue-600 rounded-sm mt-2 hover:bg-white hover:border-blue-600 hover:border hover:text-blue-600 hover:cursor-pointer'
               >
                 {eventsOnDate.length > 0 ? 'Schedule Another Event' : 'Schedule Event'}
               </button>
+
             </div>
           </div>
         ) : (
