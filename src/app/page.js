@@ -1,3 +1,4 @@
+
 "use client"
 
 import React, { useRef, useState } from 'react'
@@ -23,7 +24,7 @@ const Page = () => {
     <CalenderProvider>
       <div className='flex flex-col w-full'>
         <Navbar />
-        <div className='w-full h-screen flex items-start justify-center gap-10 p-8'>
+        <div className='w-full min-h-screen flex flex-col lg:flex-row items-start justify-center gap-6 sm:gap-8 lg:gap-10 p-4 sm:p-6 md:p-8'>
           <Details scrollToForm={scrollToForm} />
           <CalenderPreview />
         </div>

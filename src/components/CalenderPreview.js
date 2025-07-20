@@ -1,3 +1,4 @@
+
 "use client";
 
 import React from 'react';
@@ -20,9 +21,10 @@ const CalendarPreview = () => {
       title: event.title,
       start: date,
     }))
-  )
+  );
+
   return (
-    <div className='w-[50%] p-5 shadow-sm shadow-gray-700 rounded-2xl'>
+    <div className='w-full sm:w-[90%] md:w-[80%] lg:w-[70%] xl:w-[60%] 2xl:w-[50%] p-4 sm:p-5 shadow-sm shadow-gray-700 rounded-2xl mx-auto'>
       <FullCalendar
         height={"75vh"}
         plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
